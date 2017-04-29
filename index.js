@@ -11,6 +11,7 @@ function parseFormula(tokens) {
 
 function parseExpression(wrapped) {
   const single = parseSingleOperandExpression(wrapped);
+
   if (single) {
     if (wrapped.nextIsBinaryOperator()) {
       const operator = parseBinaryOperator(wrapped);
@@ -68,14 +69,14 @@ function parseBinaryOperator(wrapped) {
 }
 
 function parseSingleOperandExpression(wrapped) {
-  const literal = parseLiteral(wrapped);
-  if (literal) return literal;
+  const prefixExpression = parsePrefixExpression(wrapped);
+  if (prefixExpression) return prefixExpression;
 
   const parenExpression = parseParenExpression(wrapped);
   if (parenExpression) return parenExpression;
 
-  const unaryExpression = parseUnaryExpression(wrapped);
-  return unaryExpression;
+  const literal = parseLiteral(wrapped);
+  if (literal) return literal;
 }
 
 function parseLiteral(wrapped) {
@@ -125,13 +126,13 @@ function parseBoolean(wrapped) {
   }
 }
 
-function parseUnaryExpression(wrapped) {
-  if (wrapped.nextIsUnaryOperator()) {
+function parsePrefixExpression(wrapped) {
+  if (wrapped.nextIsPrefixOperator()) {
     const operator = wrapped.getNext().value;
     wrapped.consume();
     const operand = parseSingleOperandExpression(wrapped);
     return {
-      type: 'unary-expression',
+      type: 'prefix-expression',
       operator: operator,
       operand: operand
     };
@@ -151,11 +152,19 @@ function parseParenExpression(wrapped) {
 function parseNumber(wrapped) {
   const next = wrapped.getNext();
   if (next.type == 'operand' && next.subtype == 'number') {
-    wrapped.consume();
-    return {
+    const number = {
       type: 'number',
       value: Number(next.value)
     };
+    wrapped.consume();
+
+    if (wrapped.nextIsPostfixOperator()) {
+      number.value *= 0.01;
+
+      wrapped.consume();
+    }
+
+    return number;
   }
 }
 
@@ -180,8 +189,11 @@ function wrap(tokens) {
     nextIsBinaryOperator() {
       return this.getNext().type == 'operator-infix';
     },
-    nextIsUnaryOperator() {
+    nextIsPrefixOperator() {
       return this.getNext().type == 'operator-prefix';
+    },
+    nextIsPostfixOperator() {
+      return this.getNext().type == 'operator-postfix';
     },
     consume() {
       index += 1;
