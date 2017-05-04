@@ -97,11 +97,41 @@ function parseRange(wrapped) {
   const next = wrapped.getNext();
   if (next.type == 'operand' && next.subtype == 'range') {
     wrapped.consume();
-    return {
-      type: 'range',
-      value: next.value
-    };
+    return createCellRangeNode(next.value);
   }
+}
+
+function createCellRangeNode(value) {
+  const parts = value.split(':');
+
+  if (parts.length == 2) {
+    return {
+      type: 'cell-range',
+      left: cellNode(parts[0]),
+      right: cellNode(parts[1])
+    };
+  } else {
+    return cellNode(value);
+  }
+}
+
+function cellNode(value) {
+  return {
+    type: 'cell',
+    key: value,
+    refType: cellRefType(value)
+  };
+}
+
+function cellRefType(cell) {
+  if (/^\$[A-Z]+\$\d+$/.test(cell)) return 'absolute';
+  if (/^\$[A-Z]+$/     .test(cell)) return 'absolute';
+  if (/^\$\d+$/        .test(cell)) return 'absolute';
+  if (/^\$[A-Z]+\d+$/  .test(cell)) return 'mixed';
+  if (/^[A-Z]+\$\d+$/  .test(cell)) return 'mixed';
+  if (/^[A-Z]+\d+$/    .test(cell)) return 'relative';
+  if (/^\d+$/          .test(cell)) return 'relative';
+  if (/^[A-Z]+$/       .test(cell)) return 'relative';
 }
 
 function parseText(wrapped) {

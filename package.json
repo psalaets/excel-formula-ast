@@ -10,11 +10,11 @@
   "author": "",
   "license": "ISC",
   "peerDependencies": {
-    "excel-formula-tokenizer": "^2.0.0"
+    "excel-formula-tokenizer": "^2.0.1"
   },
   "dependencies": {},
   "devDependencies": {
-    "excel-formula-tokenizer": "^2.0.0",
+    "excel-formula-tokenizer": "^2.0.1",
     "mocha": "^3.3.0"
   }
 }

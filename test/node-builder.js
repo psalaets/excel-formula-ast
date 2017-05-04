@@ -3,9 +3,27 @@ module.exports = {
   numberNode,
   textNode,
   booleanNode,
+  cellNode,
+  cellRangeNode,
   binaryExpressionNode,
   prefixExpressionNode
 };
+
+function cellNode(key, refType) {
+  return {
+    type: 'cell',
+    refType,
+    key
+  };
+}
+
+function cellRangeNode(leftNode, rightNode) {
+  return {
+    type: 'cell-range',
+    left: leftNode,
+    right: rightNode
+  };
+}
 
 function functionCallNode(name, ...args) {
   return {
