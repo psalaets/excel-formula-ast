@@ -59,17 +59,10 @@ function parseFunctionArguments(wrapped) {
   return args;
 }
 
-function parseBinaryOperator(wrapped) {
-  const next = wrapped.getNext();
-  if (next.type == 'operator-infix') {
-    wrapped.consume();
-    return next.value;
-  }
-}
-
 function parseSingleOperandExpression(wrapped, shuntingYard) {
   if (wrapped.nextIsTerminal()) {
     shuntingYard.operands.push(parseTerminal(wrapped));
+    // parseTerminal already consumes once so don't need to consume on line below
     // wrapped.consume()
   } else if (wrapped.nextIsOpenParen()) {
     wrapped.consume();
@@ -196,29 +189,6 @@ function parseBoolean(wrapped) {
       type: 'boolean',
       value: next.value == 'TRUE'
     };
-  }
-}
-
-function parsePrefixExpression(wrapped) {
-  if (wrapped.nextIsPrefixOperator()) {
-    const operator = wrapped.getNext().value;
-    wrapped.consume();
-    const operand = parseSingleOperandExpression(wrapped);
-    return {
-      type: 'prefix-expression',
-      operator: operator,
-      operand: operand
-    };
-  }
-}
-
-function parseParenExpression(wrapped) {
-  const next = wrapped.getNext();
-  if (next.type == 'subexpression' && next.subtype == 'start') {
-    wrapped.consume();
-    const expression = parseExpression(wrapped);
-    wrapped.consume(); // close paren
-    return expression;
   }
 }
 
