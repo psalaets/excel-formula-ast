@@ -65,7 +65,7 @@ function binaryExpressionNode(operator, left, right) {
 
 function prefixExpressionNode(operator, expression) {
   return {
-    type: 'prefix-expression',
+    type: 'unary-expression',
     operator,
     operand: expression
   };
