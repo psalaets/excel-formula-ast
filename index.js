@@ -146,10 +146,8 @@ function parseTerminal(stream) {
 
 function parseRange(stream) {
   const next = stream.getNext();
-  if (stream.nextIsRange()) {
-    stream.consume();
-    return createCellRangeNode(next.value);
-  }
+  stream.consume();
+  return createCellRangeNode(next.value);
 }
 
 function createCellRangeNode(value) {
@@ -187,43 +185,37 @@ function cellRefType(cell) {
 
 function parseText(stream) {
   const next = stream.getNext();
-  if (stream.nextIsText()) {
-    stream.consume();
-    return {
-      type: 'text',
-      value: next.value
-    };
-  }
+  stream.consume();
+  return {
+    type: 'text',
+    value: next.value
+  };
 }
 
 function parseLogical(stream) {
   const next = stream.getNext();
-  if (stream.nextIsLogical()) {
-    stream.consume();
-    return {
-      type: 'boolean',
-      value: next.value == 'TRUE'
-    };
-  }
+  stream.consume();
+  return {
+    type: 'boolean',
+    value: next.value == 'TRUE'
+  };
 }
 
 function parseNumber(stream) {
   const next = stream.getNext();
-  if (stream.nextIsNumber()) {
-    const number = {
-      type: 'number',
-      value: Number(next.value)
-    };
+  const number = {
+    type: 'number',
+    value: Number(next.value)
+  };
+  stream.consume();
+
+  if (stream.nextIsPostfixOperator()) {
+    number.value *= 0.01;
+
     stream.consume();
-
-    if (stream.nextIsPostfixOperator()) {
-      number.value *= 0.01;
-
-      stream.consume();
-    }
-
-    return number;
   }
+
+  return number;
 }
 
 function createUnaryOperator(symbol) {
