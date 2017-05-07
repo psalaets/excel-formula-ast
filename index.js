@@ -6,6 +6,7 @@ const {
   SENTINEL
 } = require('./lib/shunting-yard');
 const tokenStream = require('./lib/token-stream');
+const builder = require('./lib/node-builder');
 
 module.exports = parseFormula;
 
@@ -58,7 +59,7 @@ function parseFunctionCall(stream, shuntingYard) {
   stream.consume(); // consume start of function call
 
   const args = parseFunctionArgList(stream, shuntingYard);
-  shuntingYard.operands.push(createFunctionCallNode(name, args));
+  shuntingYard.operands.push(builder.functionCall(name, args));
 
   stream.consume(); // consume end of function call
 }
@@ -91,14 +92,6 @@ function withinSentinel(shuntingYard, fn) {
   shuntingYard.operators.pop();
 }
 
-function createFunctionCallNode(name, args) {
-  return {
-    type: 'function',
-    name,
-    arguments: args
-  };
-}
-
 function pushOperator(operator, shuntingYard) {
   while (shuntingYard.operators.top().evaluatesBefore(operator)) {
     popOperator(shuntingYard);
@@ -111,29 +104,12 @@ function popOperator({operators, operands}) {
     const right = operands.pop();
     const left = operands.pop();
     const operator = operators.pop();
-    operands.push(makeBinaryExpressionNode(operator.symbol, left, right));
+    operands.push(builder.binaryExpression(operator.symbol, left, right));
   } else if (operators.top().isUnary()) {
     const operand = operands.pop();
     const operator = operators.pop();
-    operands.push(makeUnaryExpression(operator.symbol, operand));
+    operands.push(builder.unaryExpression(operator.symbol, operand));
   }
-}
-
-function makeUnaryExpression(symbol, operand) {
-  return {
-    type: 'unary-expression',
-    operator: symbol,
-    operand
-  };
-}
-
-function makeBinaryExpressionNode(symbol, left, right) {
-  return {
-    type: 'binary-expression',
-    operator: symbol,
-    left,
-    right
-  };
 }
 
 function parseTerminal(stream) {
@@ -157,75 +133,55 @@ function parseTerminal(stream) {
 function parseRange(stream) {
   const next = stream.getNext();
   stream.consume();
-  return createCellRangeNode(next.value);
+  return createCellRange(next.value);
 }
 
-function createCellRangeNode(value) {
+function createCellRange(value) {
   const parts = value.split(':');
 
   if (parts.length == 2) {
-    return {
-      type: 'cell-range',
-      left: cellNode(parts[0]),
-      right: cellNode(parts[1])
-    };
+    return builder.cellRange(
+      builder.cell(parts[0], cellRefType(parts[0])),
+      builder.cell(parts[1], cellRefType(parts[1]))
+    );
   } else {
-    return cellNode(value);
+    return builder.cell(value, cellRefType(value));
   }
 }
 
-function cellNode(value) {
-  return {
-    type: 'cell',
-    key: value,
-    refType: cellRefType(value)
-  };
-}
-
-function cellRefType(cell) {
-  if (/^\$[A-Z]+\$\d+$/.test(cell)) return 'absolute';
-  if (/^\$[A-Z]+$/     .test(cell)) return 'absolute';
-  if (/^\$\d+$/        .test(cell)) return 'absolute';
-  if (/^\$[A-Z]+\d+$/  .test(cell)) return 'mixed';
-  if (/^[A-Z]+\$\d+$/  .test(cell)) return 'mixed';
-  if (/^[A-Z]+\d+$/    .test(cell)) return 'relative';
-  if (/^\d+$/          .test(cell)) return 'relative';
-  if (/^[A-Z]+$/       .test(cell)) return 'relative';
+function cellRefType(key) {
+  if (/^\$[A-Z]+\$\d+$/.test(key)) return 'absolute';
+  if (/^\$[A-Z]+$/     .test(key)) return 'absolute';
+  if (/^\$\d+$/        .test(key)) return 'absolute';
+  if (/^\$[A-Z]+\d+$/  .test(key)) return 'mixed';
+  if (/^[A-Z]+\$\d+$/  .test(key)) return 'mixed';
+  if (/^[A-Z]+\d+$/    .test(key)) return 'relative';
+  if (/^\d+$/          .test(key)) return 'relative';
+  if (/^[A-Z]+$/       .test(key)) return 'relative';
 }
 
 function parseText(stream) {
   const next = stream.getNext();
   stream.consume();
-  return {
-    type: 'text',
-    value: next.value
-  };
+  return builder.text(next.value);
 }
 
 function parseLogical(stream) {
   const next = stream.getNext();
   stream.consume();
-  return {
-    type: 'logical',
-    value: next.value == 'TRUE'
-  };
+  return builder.logical(next.value === 'TRUE');
 }
 
 function parseNumber(stream) {
-  const next = stream.getNext();
-  const number = {
-    type: 'number',
-    value: Number(next.value)
-  };
+  let value = Number(stream.getNext().value);
   stream.consume();
 
   if (stream.nextIsPostfixOperator()) {
-    number.value *= 0.01;
-
+    value *= 0.01;
     stream.consume();
   }
 
-  return number;
+  return builder.number(value);
 }
 
 function createUnaryOperator(symbol) {
