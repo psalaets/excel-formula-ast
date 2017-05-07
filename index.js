@@ -127,17 +127,21 @@ function makeBinaryExpressionNode(symbol, left, right) {
 }
 
 function parseTerminal(wrapped) {
-  const number = parseNumber(wrapped);
-  if (number) return number;
+  if (wrapped.nextIsNumber()) {
+    return parseNumber(wrapped);
+  }
 
-  const text = parseText(wrapped);
-  if (text) return text;
+  if (wrapped.nextIsText()) {
+    return parseText(wrapped);
+  }
 
-  const boolean = parseBoolean(wrapped);
-  if (boolean) return boolean;
+  if (wrapped.nextIsLogical()) {
+    return parseLogical(wrapped);
+  }
 
-  const range = parseRange(wrapped);
-  if (range) return range;
+  if (wrapped.nextIsRange()) {
+    return parseRange(wrapped);
+  }
 }
 
 function parseRange(wrapped) {
@@ -192,7 +196,7 @@ function parseText(wrapped) {
   }
 }
 
-function parseBoolean(wrapped) {
+function parseLogical(wrapped) {
   const next = wrapped.getNext();
   if (wrapped.nextIsLogical()) {
     wrapped.consume();
