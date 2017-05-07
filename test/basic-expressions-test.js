@@ -39,6 +39,23 @@ describe('basic expressions', function () {
     );
   });
 
+  it('---1', function () {
+    const tree = parse(tokenize('---1'));
+
+    deepStrictEqual(tree,
+      prefixExpressionNode(
+        '-',
+        prefixExpressionNode(
+          '-',
+          prefixExpressionNode(
+            '-',
+            numberNode(1)
+          )
+        )
+      )
+    );
+  });
+
   it('"abc"', function () {
     const tree = parse(tokenize('"abc"'));
 
