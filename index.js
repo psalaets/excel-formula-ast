@@ -12,7 +12,6 @@ module.exports = parseFormula;
 function parseFormula(tokens) {
   const stream = tokenStream(tokens);
   const shuntingYard = createShuntingYard();
-  shuntingYard.operators.push(SENTINEL);
 
   parseExpression(stream, shuntingYard);
 
