@@ -1,12 +1,7 @@
 const parse = require('../');
 const {tokenize} = require('excel-formula-tokenizer');
 const {deepStrictEqual} = require('assert');
-const {
-  numberNode,
-  textNode,
-  binaryExpressionNode,
-  unaryExpressionNode
-} = require('./node-builder');
+const builder = require('../lib/node-builder');
 
 describe('operators', function () {
   describe('precendence', function () {
@@ -14,17 +9,17 @@ describe('operators', function () {
       const tree = parse(tokenize('1 + 2 >= 3 - 4'));
 
       deepStrictEqual(tree,
-        binaryExpressionNode(
+        builder.binaryExpression(
           '>=',
-          binaryExpressionNode(
+          builder.binaryExpression(
             '+',
-            numberNode(1),
-            numberNode(2)
+            builder.number(1),
+            builder.number(2)
           ),
-          binaryExpressionNode(
+          builder.binaryExpression(
             '-',
-            numberNode(3),
-            numberNode(4)
+            builder.number(3),
+            builder.number(4)
           )
         )
       );
@@ -34,14 +29,14 @@ describe('operators', function () {
       const tree = parse(tokenize('1 + 2 & "a"'));
 
       deepStrictEqual(tree,
-        binaryExpressionNode(
+        builder.binaryExpression(
           '&',
-          binaryExpressionNode(
+          builder.binaryExpression(
             '+',
-            numberNode(1),
-            numberNode(2)
+            builder.number(1),
+            builder.number(2)
           ),
-          textNode('a')
+          builder.text('a')
         )
       );
     });
@@ -50,13 +45,13 @@ describe('operators', function () {
       const tree = parse(tokenize('1 + 2 * 3'));
 
       deepStrictEqual(tree,
-        binaryExpressionNode(
+        builder.binaryExpression(
           '+',
-          numberNode(1),
-          binaryExpressionNode(
+          builder.number(1),
+          builder.binaryExpression(
             '*',
-            numberNode(2),
-            numberNode(3)
+            builder.number(2),
+            builder.number(3)
           )
         )
       );
@@ -66,13 +61,13 @@ describe('operators', function () {
       const tree = parse(tokenize('1 * 2 ^ 3'));
 
       deepStrictEqual(tree,
-        binaryExpressionNode(
+        builder.binaryExpression(
           '*',
-          numberNode(1),
-          binaryExpressionNode(
+          builder.number(1),
+          builder.binaryExpression(
             '^',
-            numberNode(2),
-            numberNode(3)
+            builder.number(2),
+            builder.number(3)
           )
         )
       );
@@ -82,14 +77,14 @@ describe('operators', function () {
       const tree = parse(tokenize('(1 * 2) ^ 3'));
 
       deepStrictEqual(tree,
-        binaryExpressionNode(
+        builder.binaryExpression(
           '^',
-          binaryExpressionNode(
+          builder.binaryExpression(
             '*',
-            numberNode(1),
-            numberNode(2)
+            builder.number(1),
+            builder.number(2)
           ),
-          numberNode(3)
+          builder.number(3)
         )
       );
     });
@@ -101,14 +96,14 @@ describe('operators', function () {
       const tree = parse(tokenize('1 + 2 + 3'));
 
       deepStrictEqual(tree,
-        binaryExpressionNode(
+        builder.binaryExpression(
           '+',
-          binaryExpressionNode(
+          builder.binaryExpression(
             '+',
-            numberNode(1),
-            numberNode(2)
+            builder.number(1),
+            builder.number(2)
           ),
-          numberNode(3)
+          builder.number(3)
         )
       );
     });
@@ -117,13 +112,13 @@ describe('operators', function () {
       const tree = parse(tokenize('1 + (2 + 3)'));
 
       deepStrictEqual(tree,
-        binaryExpressionNode(
+        builder.binaryExpression(
           '+',
-          numberNode(1),
-          binaryExpressionNode(
+          builder.number(1),
+          builder.binaryExpression(
             '+',
-            numberNode(2),
-            numberNode(3)
+            builder.number(2),
+            builder.number(3)
           )
         )
       );
@@ -133,14 +128,14 @@ describe('operators', function () {
       const tree = parse(tokenize('1 / 2 / 3'));
 
       deepStrictEqual(tree,
-        binaryExpressionNode(
+        builder.binaryExpression(
           '/',
-          binaryExpressionNode(
+          builder.binaryExpression(
             '/',
-            numberNode(1),
-            numberNode(2)
+            builder.number(1),
+            builder.number(2)
           ),
-          numberNode(3)
+          builder.number(3)
         )
       );
     });

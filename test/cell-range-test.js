@@ -1,18 +1,14 @@
 const parse = require('../');
 const {tokenize} = require('excel-formula-tokenizer');
 const {deepStrictEqual} = require('assert');
-const {
-  cellRangeNode,
-  cellNode,
-  binaryExpressionNode
-} = require('./node-builder');
+const builder = require('../lib/node-builder');
 
 describe('cell ranges', function () {
   it('A1', function () {
     const tree = parse(tokenize('A1'));
 
     deepStrictEqual(tree,
-      cellNode('A1', 'relative')
+      builder.cell('A1', 'relative')
     );
   });
 
@@ -20,7 +16,7 @@ describe('cell ranges', function () {
     const tree = parse(tokenize('A$1'));
 
     deepStrictEqual(tree,
-      cellNode('A$1', 'mixed')
+      builder.cell('A$1', 'mixed')
     );
   });
 
@@ -28,7 +24,7 @@ describe('cell ranges', function () {
     const tree = parse(tokenize('$A1'));
 
     deepStrictEqual(tree,
-      cellNode('$A1', 'mixed')
+      builder.cell('$A1', 'mixed')
     );
   });
 
@@ -36,7 +32,7 @@ describe('cell ranges', function () {
     const tree = parse(tokenize('$A$1'));
 
     deepStrictEqual(tree,
-      cellNode('$A$1', 'absolute')
+      builder.cell('$A$1', 'absolute')
     );
   });
 
@@ -44,9 +40,9 @@ describe('cell ranges', function () {
     const tree = parse(tokenize('A1:A4'));
 
     deepStrictEqual(tree,
-      cellRangeNode(
-        cellNode('A1', 'relative'),
-        cellNode('A4', 'relative')
+      builder.cellRange(
+        builder.cell('A1', 'relative'),
+        builder.cell('A4', 'relative')
       )
     );
   });
@@ -55,9 +51,9 @@ describe('cell ranges', function () {
     const tree = parse(tokenize('$A1:A$4'));
 
     deepStrictEqual(tree,
-      cellRangeNode(
-        cellNode('$A1', 'mixed'),
-        cellNode('A$4', 'mixed')
+      builder.cellRange(
+        builder.cell('$A1', 'mixed'),
+        builder.cell('A$4', 'mixed')
       )
     );
   });
@@ -66,9 +62,9 @@ describe('cell ranges', function () {
     const tree = parse(tokenize('$A$1:$A$4'));
 
     deepStrictEqual(tree,
-      cellRangeNode(
-        cellNode('$A$1', 'absolute'),
-        cellNode('$A$4', 'absolute')
+      builder.cellRange(
+        builder.cell('$A$1', 'absolute'),
+        builder.cell('$A$4', 'absolute')
       )
     );
   });
@@ -77,9 +73,9 @@ describe('cell ranges', function () {
     const tree = parse(tokenize('1:4'));
 
     deepStrictEqual(tree,
-      cellRangeNode(
-        cellNode('1', 'relative'),
-        cellNode('4', 'relative')
+      builder.cellRange(
+        builder.cell('1', 'relative'),
+        builder.cell('4', 'relative')
       )
     );
   });
@@ -88,9 +84,9 @@ describe('cell ranges', function () {
     const tree = parse(tokenize('$1:4'));
 
     deepStrictEqual(tree,
-      cellRangeNode(
-        cellNode('$1', 'absolute'),
-        cellNode('4', 'relative')
+      builder.cellRange(
+        builder.cell('$1', 'absolute'),
+        builder.cell('4', 'relative')
       )
     );
   });
@@ -99,9 +95,9 @@ describe('cell ranges', function () {
     const tree = parse(tokenize('C:G'));
 
     deepStrictEqual(tree,
-      cellRangeNode(
-        cellNode('C', 'relative'),
-        cellNode('G', 'relative')
+      builder.cellRange(
+        builder.cell('C', 'relative'),
+        builder.cell('G', 'relative')
       )
     );
   });
@@ -110,9 +106,9 @@ describe('cell ranges', function () {
     const tree = parse(tokenize('C:$G'));
 
     deepStrictEqual(tree,
-      cellRangeNode(
-        cellNode('C', 'relative'),
-        cellNode('$G', 'absolute')
+      builder.cellRange(
+        builder.cell('C', 'relative'),
+        builder.cell('$G', 'absolute')
       )
     );
   });
@@ -121,9 +117,9 @@ describe('cell ranges', function () {
     const tree = parse(tokenize('C:G5'));
 
     deepStrictEqual(tree,
-      cellRangeNode(
-        cellNode('C', 'relative'),
-        cellNode('G5', 'relative')
+      builder.cellRange(
+        builder.cell('C', 'relative'),
+        builder.cell('G5', 'relative')
       )
     );
   });
@@ -132,9 +128,9 @@ describe('cell ranges', function () {
     const tree = parse(tokenize('5:D5'));
 
     deepStrictEqual(tree,
-      cellRangeNode(
-        cellNode('5', 'relative'),
-        cellNode('D5', 'relative')
+      builder.cellRange(
+        builder.cell('5', 'relative'),
+        builder.cell('D5', 'relative')
       )
     );
   });
@@ -143,15 +139,15 @@ describe('cell ranges', function () {
     const tree = parse(tokenize('A1:B3,C1:D3'));
 
     deepStrictEqual(tree,
-      binaryExpressionNode(
+      builder.binaryExpression(
         ',',
-        cellRangeNode(
-          cellNode('A1', 'relative'),
-          cellNode('B3', 'relative')
+        builder.cellRange(
+          builder.cell('A1', 'relative'),
+          builder.cell('B3', 'relative')
         ),
-        cellRangeNode(
-          cellNode('C1', 'relative'),
-          cellNode('D3', 'relative')
+        builder.cellRange(
+          builder.cell('C1', 'relative'),
+          builder.cell('D3', 'relative')
         )
       )
     );
@@ -161,15 +157,15 @@ describe('cell ranges', function () {
     const tree = parse(tokenize('A1:B3 B1:D3'));
 
     deepStrictEqual(tree,
-      binaryExpressionNode(
+      builder.binaryExpression(
         ' ',
-        cellRangeNode(
-          cellNode('A1', 'relative'),
-          cellNode('B3', 'relative')
+        builder.cellRange(
+          builder.cell('A1', 'relative'),
+          builder.cell('B3', 'relative')
         ),
-        cellRangeNode(
-          cellNode('B1', 'relative'),
-          cellNode('D3', 'relative')
+        builder.cellRange(
+          builder.cell('B1', 'relative'),
+          builder.cell('D3', 'relative')
         )
       )
     );

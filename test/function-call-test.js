@@ -1,19 +1,14 @@
 const parse = require('../');
 const {tokenize} = require('excel-formula-tokenizer');
 const {deepStrictEqual} = require('assert');
-const {
-  numberNode,
-  functionCallNode,
-  binaryExpressionNode,
-  prefixExpressionNode
-} = require('./node-builder');
+const builder = require('../lib/node-builder');
 
 describe('function calls', function () {
   it('SUM()', function () {
     const tree = parse(tokenize('SUM()'));
 
     deepStrictEqual(tree,
-      functionCallNode('SUM')
+      builder.functionCall('SUM')
     );
   });
 
@@ -21,9 +16,9 @@ describe('function calls', function () {
     const tree = parse(tokenize('-SUM()'));
 
     deepStrictEqual(tree,
-      prefixExpressionNode(
+      builder.unaryExpression(
         '-',
-        functionCallNode('SUM')
+        builder.functionCall('SUM')
       )
     );
   });
@@ -32,9 +27,9 @@ describe('function calls', function () {
     const tree = parse(tokenize('SUM(1)'));
 
     deepStrictEqual(tree,
-      functionCallNode(
+      builder.functionCall(
         'SUM',
-        numberNode(1)
+        builder.number(1)
       )
     );
   });
@@ -43,10 +38,10 @@ describe('function calls', function () {
     const tree = parse(tokenize('SUM(1, 2)'));
 
     deepStrictEqual(tree,
-      functionCallNode(
+      builder.functionCall(
         'SUM',
-        numberNode(1),
-        numberNode(2)
+        builder.number(1),
+        builder.number(2)
       )
     );
   });
@@ -55,13 +50,13 @@ describe('function calls', function () {
     const tree = parse(tokenize('SUM(1, SUM(2, 3))'));
 
     deepStrictEqual(tree,
-      functionCallNode(
+      builder.functionCall(
         'SUM',
-        numberNode(1),
-        functionCallNode(
+        builder.number(1),
+        builder.functionCall(
           'SUM',
-          numberNode(2),
-          numberNode(3)
+          builder.number(2),
+          builder.number(3)
         )
       )
     );
@@ -71,17 +66,17 @@ describe('function calls', function () {
     const tree = parse(tokenize('SUM(10 / 4, SUM(2, 3))'));
 
     deepStrictEqual(tree,
-      functionCallNode(
+      builder.functionCall(
         'SUM',
-        binaryExpressionNode(
+        builder.binaryExpression(
           '/',
-          numberNode(10),
-          numberNode(4)
+          builder.number(10),
+          builder.number(4)
         ),
-        functionCallNode(
+        builder.functionCall(
           'SUM',
-          numberNode(2),
-          numberNode(3)
+          builder.number(2),
+          builder.number(3)
         )
       )
     );
@@ -91,12 +86,12 @@ describe('function calls', function () {
     const tree = parse(tokenize('2 + SUM(1)'));
 
     deepStrictEqual(tree,
-      binaryExpressionNode(
+      builder.binaryExpression(
         '+',
-        numberNode(2),
-        functionCallNode(
+        builder.number(2),
+        builder.functionCall(
           'SUM',
-          numberNode(1)
+          builder.number(1)
         )
       )
     );
@@ -106,15 +101,15 @@ describe('function calls', function () {
     const tree = parse(tokenize('2 + SUM(1, 2, 3, 4)'));
 
     deepStrictEqual(tree,
-      binaryExpressionNode(
+      builder.binaryExpression(
         '+',
-        numberNode(2),
-        functionCallNode(
+        builder.number(2),
+        builder.functionCall(
           'SUM',
-          numberNode(1),
-          numberNode(2),
-          numberNode(3),
-          numberNode(4)
+          builder.number(1),
+          builder.number(2),
+          builder.number(3),
+          builder.number(4)
         )
       )
     );
@@ -124,15 +119,15 @@ describe('function calls', function () {
     const tree = parse(tokenize('SUM(2) + SUM(1)'));
 
     deepStrictEqual(tree,
-      binaryExpressionNode(
+      builder.binaryExpression(
         '+',
-        functionCallNode(
+        builder.functionCall(
           'SUM',
-          numberNode(2)
+          builder.number(2)
         ),
-        functionCallNode(
+        builder.functionCall(
           'SUM',
-          numberNode(1)
+          builder.number(1)
         )
       )
     );
@@ -142,16 +137,16 @@ describe('function calls', function () {
     const tree = parse(tokenize('SUM(SUM(1), 2 + 3)'));
 
     deepStrictEqual(tree,
-      functionCallNode(
+      builder.functionCall(
         'SUM',
-        functionCallNode(
+        builder.functionCall(
           'SUM',
-          numberNode(1)
+          builder.number(1)
         ),
-        binaryExpressionNode(
+        builder.binaryExpression(
           '+',
-          numberNode(2),
-          numberNode(3)
+          builder.number(2),
+          builder.number(3)
         )
       )
     );
