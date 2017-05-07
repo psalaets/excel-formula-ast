@@ -10,21 +10,22 @@ const tokenStream = require('./lib/token-stream');
 module.exports = parseFormula;
 
 function parseFormula(tokens) {
+  const stream = tokenStream(tokens);
   const shuntingYard = createShuntingYard();
-  const wrapped = tokenStream(tokens);
+  shuntingYard.operators.push(SENTINEL);
 
-  parseExpression(wrapped, shuntingYard);
+  parseExpression(stream, shuntingYard);
 
   return shuntingYard.operands.top();
 }
 
-function parseExpression(wrapped, shuntingYard) {
-  parseOperandExpression(wrapped, shuntingYard);
+function parseExpression(stream, shuntingYard) {
+  parseOperandExpression(stream, shuntingYard);
 
-  while (wrapped.nextIsBinaryOperator()) {
-    pushOperator(createBinaryOperator(wrapped.getNext().value), shuntingYard);
-    wrapped.consume();
-    parseOperandExpression(wrapped, shuntingYard);
+  while (stream.nextIsBinaryOperator()) {
+    pushOperator(createBinaryOperator(stream.getNext().value), shuntingYard);
+    stream.consume();
+    parseOperandExpression(stream, shuntingYard);
   }
 
   while (shuntingYard.operators.top() !== SENTINEL) {
@@ -32,44 +33,44 @@ function parseExpression(wrapped, shuntingYard) {
   }
 }
 
-function parseOperandExpression(wrapped, shuntingYard) {
-  if (wrapped.nextIsTerminal()) {
-    shuntingYard.operands.push(parseTerminal(wrapped));
+function parseOperandExpression(stream, shuntingYard) {
+  if (stream.nextIsTerminal()) {
+    shuntingYard.operands.push(parseTerminal(stream));
     // parseTerminal already consumes once so don't need to consume on line below
-    // wrapped.consume()
-  } else if (wrapped.nextIsOpenParen()) {
-    wrapped.consume();
+    // stream.consume()
+  } else if (stream.nextIsOpenParen()) {
+    stream.consume();
     shuntingYard.operators.push(SENTINEL);
-    parseExpression(wrapped, shuntingYard);
-    wrapped.consume(); // close paren
+    parseExpression(stream, shuntingYard);
+    stream.consume(); // close paren
     shuntingYard.operators.pop();
-  } else if (wrapped.nextIsPrefixOperator()) {
-    let unaryOperator = createUnaryOperator(wrapped.getNext().value);
+  } else if (stream.nextIsPrefixOperator()) {
+    let unaryOperator = createUnaryOperator(stream.getNext().value);
     pushOperator(unaryOperator, shuntingYard);
-    wrapped.consume();
-    parseOperandExpression(wrapped, shuntingYard);
-  } else if (wrapped.nextIsFunctionCall()) {
-    parseFunctionCall(wrapped, shuntingYard);
+    stream.consume();
+    parseOperandExpression(stream, shuntingYard);
+  } else if (stream.nextIsFunctionCall()) {
+    parseFunctionCall(stream, shuntingYard);
   }
 }
 
-function parseFunctionCall(wrapped, shuntingYard) {
-  const name = wrapped.getNext().value;
-  wrapped.consume();
+function parseFunctionCall(stream, shuntingYard) {
+  const name = stream.getNext().value;
+  stream.consume();
 
   shuntingYard.operators.push(SENTINEL);
 
   let arity = 0;
-  while (!wrapped.nextIsEndOfFunctionCall()) {
-    parseExpression(wrapped, shuntingYard);
+  while (!stream.nextIsEndOfFunctionCall()) {
+    parseExpression(stream, shuntingYard);
     arity += 1;
 
-    if (wrapped.nextIsFunctionArgumentSeparator()) {
-      wrapped.consume();
+    if (stream.nextIsFunctionArgumentSeparator()) {
+      stream.consume();
     }
   }
 
-  wrapped.consume(); // consume end of function call
+  stream.consume(); // consume end of function call
 
   const reverseArgs = [];
   for (let i = 0; i < arity; i++) {
@@ -126,28 +127,28 @@ function makeBinaryExpressionNode(symbol, left, right) {
   };
 }
 
-function parseTerminal(wrapped) {
-  if (wrapped.nextIsNumber()) {
-    return parseNumber(wrapped);
+function parseTerminal(stream) {
+  if (stream.nextIsNumber()) {
+    return parseNumber(stream);
   }
 
-  if (wrapped.nextIsText()) {
-    return parseText(wrapped);
+  if (stream.nextIsText()) {
+    return parseText(stream);
   }
 
-  if (wrapped.nextIsLogical()) {
-    return parseLogical(wrapped);
+  if (stream.nextIsLogical()) {
+    return parseLogical(stream);
   }
 
-  if (wrapped.nextIsRange()) {
-    return parseRange(wrapped);
+  if (stream.nextIsRange()) {
+    return parseRange(stream);
   }
 }
 
-function parseRange(wrapped) {
-  const next = wrapped.getNext();
-  if (wrapped.nextIsRange()) {
-    wrapped.consume();
+function parseRange(stream) {
+  const next = stream.getNext();
+  if (stream.nextIsRange()) {
+    stream.consume();
     return createCellRangeNode(next.value);
   }
 }
@@ -185,10 +186,10 @@ function cellRefType(cell) {
   if (/^[A-Z]+$/       .test(cell)) return 'relative';
 }
 
-function parseText(wrapped) {
-  const next = wrapped.getNext();
-  if (wrapped.nextIsText()) {
-    wrapped.consume();
+function parseText(stream) {
+  const next = stream.getNext();
+  if (stream.nextIsText()) {
+    stream.consume();
     return {
       type: 'text',
       value: next.value
@@ -196,10 +197,10 @@ function parseText(wrapped) {
   }
 }
 
-function parseLogical(wrapped) {
-  const next = wrapped.getNext();
-  if (wrapped.nextIsLogical()) {
-    wrapped.consume();
+function parseLogical(stream) {
+  const next = stream.getNext();
+  if (stream.nextIsLogical()) {
+    stream.consume();
     return {
       type: 'boolean',
       value: next.value == 'TRUE'
@@ -207,19 +208,19 @@ function parseLogical(wrapped) {
   }
 }
 
-function parseNumber(wrapped) {
-  const next = wrapped.getNext();
-  if (wrapped.nextIsNumber()) {
+function parseNumber(stream) {
+  const next = stream.getNext();
+  if (stream.nextIsNumber()) {
     const number = {
       type: 'number',
       value: Number(next.value)
     };
-    wrapped.consume();
+    stream.consume();
 
-    if (wrapped.nextIsPostfixOperator()) {
+    if (stream.nextIsPostfixOperator()) {
       number.value *= 0.01;
 
-      wrapped.consume();
+      stream.consume();
     }
 
     return number;
