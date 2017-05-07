@@ -18,12 +18,12 @@ function parseFormula(tokens) {
 }
 
 function parseExpression(wrapped, shuntingYard) {
-  parseSingleOperandExpression(wrapped, shuntingYard);
+  parseOperandExpression(wrapped, shuntingYard);
 
   while (wrapped.nextIsBinaryOperator()) {
     pushOperator(createBinaryOperator(wrapped.getNext().value), shuntingYard);
     wrapped.consume();
-    parseSingleOperandExpression(wrapped, shuntingYard);
+    parseOperandExpression(wrapped, shuntingYard);
   }
 
   while (shuntingYard.operators.top() !== SENTINEL) {
@@ -59,7 +59,7 @@ function parseFunctionArguments(wrapped) {
   return args;
 }
 
-function parseSingleOperandExpression(wrapped, shuntingYard) {
+function parseOperandExpression(wrapped, shuntingYard) {
   if (wrapped.nextIsTerminal()) {
     shuntingYard.operands.push(parseTerminal(wrapped));
     // parseTerminal already consumes once so don't need to consume on line below
@@ -74,8 +74,41 @@ function parseSingleOperandExpression(wrapped, shuntingYard) {
     let unaryOperator = createUnaryOperator(wrapped.getNext().value);
     pushOperator(unaryOperator, shuntingYard);
     wrapped.consume();
-    parseSingleOperandExpression(wrapped, shuntingYard);
+    parseOperandExpression(wrapped, shuntingYard);
+  } else if (wrapped.nextIsFunctionCall()) {
+    parseFunctionCall(wrapped, shuntingYard);
   }
+}
+
+function parseFunctionCall(wrapped, shuntingYard) {
+  const name = wrapped.getNext().value;
+  wrapped.consume();
+
+  let arity = 0;
+  while (!wrapped.nextIsEndOfFunctionCall()) {
+    parseExpression(wrapped, shuntingYard);
+    arity += 1;
+
+    if (wrapped.nextIsFunctionArgumentSeparator()) {
+      wrapped.consume();
+    }
+  }
+
+  wrapped.consume(); // consume end of function call
+
+  const reverseArgs = [];
+  for (let i = 0; i < arity; i++) {
+    reverseArgs.push(shuntingYard.operands.pop());
+  }
+  shuntingYard.operands.push(createFunctionCallNode(name, reverseArgs.reverse()));
+}
+
+function createFunctionCallNode(name, args) {
+  return {
+    type: 'function',
+    name,
+    arguments: args
+  };
 }
 
 function pushOperator(operator, shuntingYard) {
