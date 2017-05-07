@@ -5,12 +5,13 @@ const {
   operator: createOperator,
   SENTINEL
 } = require('./lib/shunting-yard');
+const tokenStream = require('./lib/token-stream');
 
 module.exports = parseFormula;
 
 function parseFormula(tokens) {
   const shuntingYard = createShuntingYard();
-  const wrapped = wrap(tokens);
+  const wrapped = tokenStream(tokens);
 
   parseExpression(wrapped, shuntingYard);
 
@@ -255,51 +256,4 @@ function createBinaryOperator(symbol) {
   }[symbol];
 
   return createOperator(symbol, precendence, 2, true);
-}
-
-function wrap(tokens) {
-  const end = {};
-  const arr = [...tokens, end];
-  let index = 0;
-
-  return {
-    getNext() {
-      return arr[index];
-    },
-    nextIsOpenParen() {
-      return this.getNext().type == 'subexpression' && this.getNext().subtype == 'start'
-    },
-    nextIsTerminal() {
-      const next = this.getNext();
-      if (next.type == 'operand' && next.subtype == 'number') return true;
-      if (next.type == 'operand' && next.subtype == 'text') return true;
-      if (next.type == 'operand' && next.subtype == 'logical') return true;
-      if (next.type == 'operand' && next.subtype == 'range') return true;
-      return false;
-    },
-    nextIsFunctionCall() {
-      return this.getNext().type == 'function' && this.getNext().subtype == 'start';
-    },
-    nextIsFunctionArgumentSeparator() {
-      return this.getNext().type == 'argument';
-    },
-    nextIsEndOfFunctionCall() {
-      return this.getNext().type == 'function' && this.getNext().subtype == 'stop';
-    },
-    nextIsBinaryOperator() {
-      return this.getNext().type == 'operator-infix';
-    },
-    nextIsPrefixOperator() {
-      return this.getNext().type == 'operator-prefix';
-    },
-    nextIsPostfixOperator() {
-      return this.getNext().type == 'operator-postfix';
-    },
-    consume() {
-      index += 1;
-    },
-    hasEnded() {
-      return index >= arr.length - 1;
-    }
-  };
 }
