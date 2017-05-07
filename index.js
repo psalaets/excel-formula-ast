@@ -31,34 +31,6 @@ function parseExpression(wrapped, shuntingYard) {
   }
 }
 
-function parseFunctionCall(wrapped) {
-  if (wrapped.nextIsFunctionCall()) {
-    const next = wrapped.getNext();
-    wrapped.consume();
-
-    const fn = {
-      type: 'function',
-      name: next.value,
-      arguments: parseFunctionArguments(wrapped)
-    };
-
-    return fn;
-  }
-}
-
-function parseFunctionArguments(wrapped) {
-  const args = [];
-
-  while (!wrapped.nextIsEndOfFunctionCall()) {
-    args.push(parseExpression(wrapped));
-    if (wrapped.nextIsFunctionArgumentSeparator()) {
-      wrapped.consume();
-    }
-  }
-
-  return args;
-}
-
 function parseOperandExpression(wrapped, shuntingYard) {
   if (wrapped.nextIsTerminal()) {
     shuntingYard.operands.push(parseTerminal(wrapped));
@@ -84,6 +56,8 @@ function parseFunctionCall(wrapped, shuntingYard) {
   const name = wrapped.getNext().value;
   wrapped.consume();
 
+  shuntingYard.operators.push(SENTINEL);
+
   let arity = 0;
   while (!wrapped.nextIsEndOfFunctionCall()) {
     parseExpression(wrapped, shuntingYard);
@@ -100,6 +74,9 @@ function parseFunctionCall(wrapped, shuntingYard) {
   for (let i = 0; i < arity; i++) {
     reverseArgs.push(shuntingYard.operands.pop());
   }
+
+  shuntingYard.operators.pop();
+
   shuntingYard.operands.push(createFunctionCallNode(name, reverseArgs.reverse()));
 }
 

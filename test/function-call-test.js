@@ -4,7 +4,8 @@ const {deepStrictEqual} = require('assert');
 const {
   numberNode,
   functionCallNode,
-  binaryExpressionNode
+  binaryExpressionNode,
+  prefixExpressionNode
 } = require('./node-builder');
 
 describe('function calls', function () {
@@ -13,6 +14,17 @@ describe('function calls', function () {
 
     deepStrictEqual(tree,
       functionCallNode('SUM')
+    );
+  });
+
+  it('-SUM()', function () {
+    const tree = parse(tokenize('-SUM()'));
+
+    deepStrictEqual(tree,
+      prefixExpressionNode(
+        '-',
+        functionCallNode('SUM')
+      )
     );
   });
 
@@ -68,6 +80,76 @@ describe('function calls', function () {
         ),
         functionCallNode(
           'SUM',
+          numberNode(2),
+          numberNode(3)
+        )
+      )
+    );
+  });
+
+  it('2 + SUM(1)', function () {
+    const tree = parse(tokenize('2 + SUM(1)'));
+
+    deepStrictEqual(tree,
+      binaryExpressionNode(
+        '+',
+        numberNode(2),
+        functionCallNode(
+          'SUM',
+          numberNode(1)
+        )
+      )
+    );
+  });
+
+  it('2 + SUM(1, 2, 3, 4)', function () {
+    const tree = parse(tokenize('2 + SUM(1, 2, 3, 4)'));
+
+    deepStrictEqual(tree,
+      binaryExpressionNode(
+        '+',
+        numberNode(2),
+        functionCallNode(
+          'SUM',
+          numberNode(1),
+          numberNode(2),
+          numberNode(3),
+          numberNode(4)
+        )
+      )
+    );
+  });
+
+  it('SUM(2) + SUM(1)', function () {
+    const tree = parse(tokenize('SUM(2) + SUM(1)'));
+
+    deepStrictEqual(tree,
+      binaryExpressionNode(
+        '+',
+        functionCallNode(
+          'SUM',
+          numberNode(2)
+        ),
+        functionCallNode(
+          'SUM',
+          numberNode(1)
+        )
+      )
+    );
+  });
+
+  it('SUM(SUM(1), 2 + 3)', function () {
+    const tree = parse(tokenize('SUM(SUM(1), 2 + 3)'));
+
+    deepStrictEqual(tree,
+      functionCallNode(
+        'SUM',
+        functionCallNode(
+          'SUM',
+          numberNode(1)
+        ),
+        binaryExpressionNode(
+          '+',
           numberNode(2),
           numberNode(3)
         )
