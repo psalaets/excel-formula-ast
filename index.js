@@ -38,11 +38,11 @@ function parseOperandExpression(stream, shuntingYard) {
     // parseTerminal already consumes once so don't need to consume on line below
     // stream.consume()
   } else if (stream.nextIsOpenParen()) {
-    stream.consume();
-    shuntingYard.operators.push(SENTINEL);
-    parseExpression(stream, shuntingYard);
+    stream.consume(); // open paren
+    withinSentinel(shuntingYard, function () {
+      parseExpression(stream, shuntingYard);
+    });
     stream.consume(); // close paren
-    shuntingYard.operators.pop();
   } else if (stream.nextIsPrefixOperator()) {
     let unaryOperator = createUnaryOperator(stream.getNext().value);
     pushOperator(unaryOperator, shuntingYard);
@@ -55,30 +55,40 @@ function parseOperandExpression(stream, shuntingYard) {
 
 function parseFunctionCall(stream, shuntingYard) {
   const name = stream.getNext().value;
-  stream.consume();
+  stream.consume(); // consume start of function call
 
-  shuntingYard.operators.push(SENTINEL);
-
-  let arity = 0;
-  while (!stream.nextIsEndOfFunctionCall()) {
-    parseExpression(stream, shuntingYard);
-    arity += 1;
-
-    if (stream.nextIsFunctionArgumentSeparator()) {
-      stream.consume();
-    }
-  }
+  const args = parseFunctionArgList(stream, shuntingYard);
+  shuntingYard.operands.push(createFunctionCallNode(name, args));
 
   stream.consume(); // consume end of function call
+}
 
+function parseFunctionArgList(stream, shuntingYard) {
   const reverseArgs = [];
-  for (let i = 0; i < arity; i++) {
-    reverseArgs.push(shuntingYard.operands.pop());
-  }
 
+  withinSentinel(shuntingYard, function () {
+    let arity = 0;
+    while (!stream.nextIsEndOfFunctionCall()) {
+      parseExpression(stream, shuntingYard);
+      arity += 1;
+
+      if (stream.nextIsFunctionArgumentSeparator()) {
+        stream.consume();
+      }
+    }
+
+    for (let i = 0; i < arity; i++) {
+      reverseArgs.push(shuntingYard.operands.pop());
+    }
+  });
+
+  return reverseArgs.reverse();
+}
+
+function withinSentinel(shuntingYard, fn) {
+  shuntingYard.operators.push(SENTINEL);
+  fn();
   shuntingYard.operators.pop();
-
-  shuntingYard.operands.push(createFunctionCallNode(name, reverseArgs.reverse()));
 }
 
 function createFunctionCallNode(name, args) {
