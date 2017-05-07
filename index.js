@@ -196,7 +196,7 @@ function parseLogical(stream) {
   const next = stream.getNext();
   stream.consume();
   return {
-    type: 'boolean',
+    type: 'logical',
     value: next.value == 'TRUE'
   };
 }

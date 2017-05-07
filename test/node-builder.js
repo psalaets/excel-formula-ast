@@ -49,7 +49,7 @@ function textNode(value) {
 
 function booleanNode(value) {
   return {
-    type: 'boolean',
+    type: 'logical',
     value
   };
 }
