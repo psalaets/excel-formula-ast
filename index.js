@@ -142,7 +142,7 @@ function parseTerminal(wrapped) {
 
 function parseRange(wrapped) {
   const next = wrapped.getNext();
-  if (next.type == 'operand' && next.subtype == 'range') {
+  if (wrapped.nextIsRange()) {
     wrapped.consume();
     return createCellRangeNode(next.value);
   }
@@ -183,7 +183,7 @@ function cellRefType(cell) {
 
 function parseText(wrapped) {
   const next = wrapped.getNext();
-  if (next.type == 'operand' && next.subtype == 'text') {
+  if (wrapped.nextIsText()) {
     wrapped.consume();
     return {
       type: 'text',
@@ -194,7 +194,7 @@ function parseText(wrapped) {
 
 function parseBoolean(wrapped) {
   const next = wrapped.getNext();
-  if (next.type == 'operand' && next.subtype == 'logical') {
+  if (wrapped.nextIsLogical()) {
     wrapped.consume();
     return {
       type: 'boolean',
@@ -205,7 +205,7 @@ function parseBoolean(wrapped) {
 
 function parseNumber(wrapped) {
   const next = wrapped.getNext();
-  if (next.type == 'operand' && next.subtype == 'number') {
+  if (wrapped.nextIsNumber()) {
     const number = {
       type: 'number',
       value: Number(next.value)
