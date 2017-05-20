@@ -1,2 +1,2 @@
 module.exports.buildTree = require('./lib/build-tree');
-module.exports.visitor = require('./lib/visitor');
+module.exports.visit = require('./lib/visit');
