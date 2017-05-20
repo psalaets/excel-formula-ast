@@ -1,14 +1,19 @@
 {
   "name": "excel-formula-ast",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "Abstract syntax tree for excel formulas",
   "main": "index.js",
   "scripts": {
     "test": "mocha 'test/*-test.js'"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["excel", "formula", "parse", "ast"],
+  "author": "Paul Salaets <psalaets@gmail.com>",
+  "homepage": "https://github.com/psalaets/excel-formula-ast",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/psalaets/excel-formula-ast.git"
+  },
+  "license": "MIT",
   "peerDependencies": {},
   "dependencies": {},
   "devDependencies": {
