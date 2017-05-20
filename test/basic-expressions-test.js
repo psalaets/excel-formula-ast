@@ -1,4 +1,4 @@
-const parse = require('../');
+const {parse} = require('../');
 const {tokenize} = require('excel-formula-tokenizer');
 const {deepStrictEqual} = require('assert');
 const builder = require('../lib/node-builder');

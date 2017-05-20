@@ -8,7 +8,8 @@ const {
 const tokenStream = require('./lib/token-stream');
 const builder = require('./lib/node-builder');
 
-module.exports = parseFormula;
+// module.exports = parseFormula;
+module.exports.parse = parseFormula;
 
 function parseFormula(tokens) {
   const stream = tokenStream(tokens);
