@@ -1,6 +1,6 @@
 const {deepStrictEqual} = require('assert');
 const builder = require('../lib/node-builder');
-const visitor = require('../lib/visitor');
+const {visitor} = require('../');
 
 describe('visiting', function () {
   it('cell node', function () {
