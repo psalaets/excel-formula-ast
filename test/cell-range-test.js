@@ -1,11 +1,11 @@
-const {parse} = require('../');
+const {buildTree} = require('../');
 const {tokenize} = require('excel-formula-tokenizer');
 const {deepStrictEqual} = require('assert');
 const builder = require('../lib/node-builder');
 
 describe('cell ranges', function () {
   it('A1', function () {
-    const tree = parse(tokenize('A1'));
+    const tree = buildTree(tokenize('A1'));
 
     deepStrictEqual(tree,
       builder.cell('A1', 'relative')
@@ -13,7 +13,7 @@ describe('cell ranges', function () {
   });
 
   it('A$1', function () {
-    const tree = parse(tokenize('A$1'));
+    const tree = buildTree(tokenize('A$1'));
 
     deepStrictEqual(tree,
       builder.cell('A$1', 'mixed')
@@ -21,7 +21,7 @@ describe('cell ranges', function () {
   });
 
   it('$A1', function () {
-    const tree = parse(tokenize('$A1'));
+    const tree = buildTree(tokenize('$A1'));
 
     deepStrictEqual(tree,
       builder.cell('$A1', 'mixed')
@@ -29,7 +29,7 @@ describe('cell ranges', function () {
   });
 
   it('$A$1', function () {
-    const tree = parse(tokenize('$A$1'));
+    const tree = buildTree(tokenize('$A$1'));
 
     deepStrictEqual(tree,
       builder.cell('$A$1', 'absolute')
@@ -37,7 +37,7 @@ describe('cell ranges', function () {
   });
 
   it('A1:A4', function () {
-    const tree = parse(tokenize('A1:A4'));
+    const tree = buildTree(tokenize('A1:A4'));
 
     deepStrictEqual(tree,
       builder.cellRange(
@@ -48,7 +48,7 @@ describe('cell ranges', function () {
   });
 
   it('$A1:A$4', function () {
-    const tree = parse(tokenize('$A1:A$4'));
+    const tree = buildTree(tokenize('$A1:A$4'));
 
     deepStrictEqual(tree,
       builder.cellRange(
@@ -59,7 +59,7 @@ describe('cell ranges', function () {
   });
 
   it('$A$1:$A$4', function () {
-    const tree = parse(tokenize('$A$1:$A$4'));
+    const tree = buildTree(tokenize('$A$1:$A$4'));
 
     deepStrictEqual(tree,
       builder.cellRange(
@@ -70,7 +70,7 @@ describe('cell ranges', function () {
   });
 
   it('1:4', function () {
-    const tree = parse(tokenize('1:4'));
+    const tree = buildTree(tokenize('1:4'));
 
     deepStrictEqual(tree,
       builder.cellRange(
@@ -81,7 +81,7 @@ describe('cell ranges', function () {
   });
 
   it('$1:4', function () {
-    const tree = parse(tokenize('$1:4'));
+    const tree = buildTree(tokenize('$1:4'));
 
     deepStrictEqual(tree,
       builder.cellRange(
@@ -92,7 +92,7 @@ describe('cell ranges', function () {
   });
 
   it('C:G', function () {
-    const tree = parse(tokenize('C:G'));
+    const tree = buildTree(tokenize('C:G'));
 
     deepStrictEqual(tree,
       builder.cellRange(
@@ -103,7 +103,7 @@ describe('cell ranges', function () {
   });
 
   it('C:$G', function () {
-    const tree = parse(tokenize('C:$G'));
+    const tree = buildTree(tokenize('C:$G'));
 
     deepStrictEqual(tree,
       builder.cellRange(
@@ -114,7 +114,7 @@ describe('cell ranges', function () {
   });
 
   it('C:G5', function () {
-    const tree = parse(tokenize('C:G5'));
+    const tree = buildTree(tokenize('C:G5'));
 
     deepStrictEqual(tree,
       builder.cellRange(
@@ -125,7 +125,7 @@ describe('cell ranges', function () {
   });
 
   it('5:D5', function () {
-    const tree = parse(tokenize('5:D5'));
+    const tree = buildTree(tokenize('5:D5'));
 
     deepStrictEqual(tree,
       builder.cellRange(
@@ -136,7 +136,7 @@ describe('cell ranges', function () {
   });
 
   it('A1:B3,C1:D3', function () {
-    const tree = parse(tokenize('A1:B3,C1:D3'));
+    const tree = buildTree(tokenize('A1:B3,C1:D3'));
 
     deepStrictEqual(tree,
       builder.binaryExpression(
@@ -154,7 +154,7 @@ describe('cell ranges', function () {
   });
 
   it('A1:B3 B1:D3', function () {
-    const tree = parse(tokenize('A1:B3 B1:D3'));
+    const tree = buildTree(tokenize('A1:B3 B1:D3'));
 
     deepStrictEqual(tree,
       builder.binaryExpression(
