@@ -7,7 +7,7 @@ describe('visiting', function () {
     const recorder = createRecorder();
     const A1 = builder.cell('A1', 'relative');
 
-    visitor(recorder).visit(A1);
+    visitor(A1, recorder);
 
     deepStrictEqual(recorder.calls, [
       ['enterCell', A1],
@@ -21,7 +21,7 @@ describe('visiting', function () {
     const A2 = builder.cell('A2', 'relative');
     const cellRange = builder.cellRange(A1, A2);
 
-    visitor(recorder).visit(cellRange);
+    visitor(cellRange, recorder);
 
     deepStrictEqual(recorder.calls, [
       ['enterCellRange', cellRange],
@@ -37,7 +37,7 @@ describe('visiting', function () {
     const recorder = createRecorder();
     const number = builder.number(5);
 
-    visitor(recorder).visit(number);
+    visitor(number, recorder);
 
     deepStrictEqual(recorder.calls, [
       ['enterNumber', number],
@@ -49,7 +49,7 @@ describe('visiting', function () {
     const recorder = createRecorder();
     const text = builder.text('asdf');
 
-    visitor(recorder).visit(text);
+    visitor(text, recorder);
 
     deepStrictEqual(recorder.calls, [
       ['enterText', text],
@@ -61,7 +61,7 @@ describe('visiting', function () {
     const recorder = createRecorder();
     const logical = builder.logical(true);
 
-    visitor(recorder).visit(logical);
+    visitor(logical, recorder);
 
     deepStrictEqual(recorder.calls, [
       ['enterLogical', logical],
@@ -75,7 +75,7 @@ describe('visiting', function () {
     const text = builder.text('dogs');
     const fn = builder.functionCall('get', number, text);
 
-    visitor(recorder).visit(fn);
+    visitor(fn, recorder);
 
     deepStrictEqual(recorder.calls, [
       ['enterFunction', fn],
@@ -93,7 +93,7 @@ describe('visiting', function () {
     const text = builder.text('dogs');
     const expr = builder.binaryExpression('+', number, text);
 
-    visitor(recorder).visit(expr);
+    visitor(expr, recorder);
 
     deepStrictEqual(recorder.calls, [
       ['enterBinaryExpression', expr],
@@ -110,7 +110,7 @@ describe('visiting', function () {
     const number = builder.number(3);
     const expr = builder.unaryExpression('-', number);
 
-    visitor(recorder).visit(expr);
+    visitor(expr, recorder);
 
     deepStrictEqual(recorder.calls, [
       ['enterUnaryExpression', expr],
