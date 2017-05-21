@@ -85,6 +85,86 @@ Object with any of these function properties:
 
 For any node type Foo, `enterFoo()` is called when the visitor gets to a Foo node. `exitFoo()` is called when the visitor has visited all of the Foo's children (if any) and is leaving the Foo.
 
+## Node Types
+
+### cell
+
+Passed to visitor methods: `enterCell`, `exitCell`
+
+Properties:
+
+- type: string - `'cell'`
+- key: string - Excel cell number. Example: `'A1'`
+- refType: string - `'relative' | 'mixed' | 'absolute'`
+
+### cell range
+
+Passed to visitor methods: `enterCellRange`, `exitCellRange`
+
+Properties:
+
+- type: string - `'cell-range'`
+- left: cell node
+- right: cell node
+
+### function
+
+Passed to visitor methods: `'enterFunction'`, `'exitFunction'`
+
+Properties:
+
+- type: string - `'function'`
+- name: string - function name
+- arguments: Array<node>
+
+### number
+
+Passed to visitor methods: `'enterNumber'`, `'exitNumber'`
+
+Properties:
+
+- type: string - `'number'`
+- value: number
+
+### text
+
+Passed to visitor methods: `'enterText'`, `'exitText'`
+
+Properties:
+
+- type: string - `'text'`
+- value: string
+
+### logical
+
+Passed to visitor methods `'enterLogical'`, `'exitLogical'`
+
+Properties:
+
+- type: string - `'logical'`
+- value: boolean
+
+### binary expression
+
+Passed to visitor methods: `'enterBinaryExpression'`, `'exitBinaryExpression'`
+
+Properties:
+
+- type: string - `'binary-expression'`
+- operator: string
+- left: node
+- right: node
+
+### unary expression
+
+Passed to visitor methods: `'enterUnaryExpression'`, `'exitUnaryExpression'`
+
+Properties:
+
+- type: string - `'unary-expression'`
+- operator: string
+- operand: node
+
 ##  License
 
 MIT
