@@ -1,6 +1,6 @@
 {
   "name": "excel-formula-ast",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Abstract syntax tree for excel formulas",
   "main": "index.js",
   "scripts": {
