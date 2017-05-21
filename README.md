@@ -45,7 +45,7 @@ visit(tree, visitor);
 
 ### buildTree(tokens)
 
-Accepts tokens from `excel-formula-tokenizer` and builds expression tree.
+Accepts tokens from `excel-formula-tokenizer` ([github](https://github.com/psalaets/excel-formula-tokenizer) | [npm](https://www.npmjs.com/package/excel-formula-tokenizer)) and builds expression tree.
 
 ### visit(tree, visitor)
 
@@ -53,7 +53,7 @@ Send a visitor through the tree nodes.
 
 #### visitor
 
-Object with any of these function properties:
+Visitor is an object with any of these function properties:
 
 ```js
 {
@@ -83,7 +83,10 @@ Object with any of these function properties:
 }
 ```
 
-For any node type Foo, `enterFoo()` is called when the visitor gets to a Foo node. `exitFoo()` is called when the visitor has visited all of the Foo's children (if any) and is leaving the Foo.
+For any node type Foo
+
+- `enterFoo()` is called when the visitor gets to a Foo node.
+- `exitFoo()` is called when the visitor has visited all of the Foo's child nodes (if any) and is leaving the Foo.
 
 ## Node Types
 
