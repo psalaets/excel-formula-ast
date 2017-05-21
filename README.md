@@ -43,6 +43,10 @@ visit(tree, visitor);
 
 ## API
 
+```js
+const {buildTree, visit} = require('excel-formula-ast');
+```
+
 ### buildTree(tokens)
 
 Build expression tree from tokens.
