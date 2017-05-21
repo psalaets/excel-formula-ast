@@ -123,7 +123,7 @@ Properties:
 
 ### function
 
-Passed to visitor methods: `'enterFunction'`, `'exitFunction'`
+Passed to visitor methods: `enterFunction`, `exitFunction`
 
 Properties:
 
@@ -133,7 +133,7 @@ Properties:
 
 ### number
 
-Passed to visitor methods: `'enterNumber'`, `'exitNumber'`
+Passed to visitor methods: `enterNumber`, `exitNumber`
 
 Properties:
 
@@ -142,7 +142,7 @@ Properties:
 
 ### text
 
-Passed to visitor methods: `'enterText'`, `'exitText'`
+Passed to visitor methods: `enterText`, `exitText`
 
 Properties:
 
@@ -151,7 +151,7 @@ Properties:
 
 ### logical
 
-Passed to visitor methods `'enterLogical'`, `'exitLogical'`
+Passed to visitor methods `enterLogical`, `exitLogical`
 
 Properties:
 
@@ -160,11 +160,11 @@ Properties:
 
 ### binary expression
 
-Passed to visitor methods: `'enterBinaryExpression'`, `'exitBinaryExpression'`
+Passed to visitor methods: `enterBinaryExpression`, `exitBinaryExpression`
 
 Properties:
 
-- type: string - `'binary-expression'`
+- type: string - `binary-expression`
 - operator: string
 - left: node
 - right: node
