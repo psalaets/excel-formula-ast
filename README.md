@@ -45,11 +45,18 @@ visit(tree, visitor);
 
 ### buildTree(tokens)
 
-Accepts tokens from `excel-formula-tokenizer` ([github](https://github.com/psalaets/excel-formula-tokenizer) | [npm](https://www.npmjs.com/package/excel-formula-tokenizer)) and builds expression tree.
+Build expression tree from tokens.
+
+- tokens: Array of objects - Tokens from `excel-formula-tokenizer` ([github](https://github.com/psalaets/excel-formula-tokenizer) | [npm](https://www.npmjs.com/package/excel-formula-tokenizer))
+
+Returns: [ast node](https://github.com/psalaets/excel-formula-ast#node-types)
 
 ### visit(tree, visitor)
 
 Send a visitor through the tree nodes.
+
+- tree: [ast node](https://github.com/psalaets/excel-formula-ast#node-types)
+- visitor: object
 
 #### visitor
 
