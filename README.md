@@ -118,7 +118,7 @@ Properties:
 
 - type: string - `'function'`
 - name: string - function name
-- arguments: Array<node>
+- arguments: Array of node
 
 ### number
 
