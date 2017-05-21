@@ -171,7 +171,7 @@ Properties:
 
 ### unary expression
 
-Passed to visitor methods: `'enterUnaryExpression'`, `'exitUnaryExpression'`
+Passed to visitor methods: `enterUnaryExpression`, `exitUnaryExpression`
 
 Properties:
 
