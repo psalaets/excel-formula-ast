@@ -7,7 +7,12 @@
   "scripts": {
     "test": "mocha 'test/*-test.js'"
   },
-  "keywords": ["excel", "formula", "parse", "ast"],
+  "keywords": [
+    "excel",
+    "formula",
+    "parse",
+    "ast"
+  ],
   "author": "Paul Salaets <psalaets@gmail.com>",
   "homepage": "https://github.com/psalaets/excel-formula-ast",
   "repository": {
@@ -18,7 +23,7 @@
   "peerDependencies": {},
   "dependencies": {},
   "devDependencies": {
-    "excel-formula-tokenizer": "^2.0.1",
+    "excel-formula-tokenizer": "^2.2.0",
     "mocha": "^3.3.0"
   }
 }
