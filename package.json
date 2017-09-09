@@ -5,7 +5,7 @@
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {
-    "test": "mocha 'test/*-test.js'"
+    "test": "mocha"
   },
   "keywords": [
     "excel",
