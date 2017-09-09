@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.1] - 2017-09-08
+
+### Fixed
+
+- No longer hangs when given invalid expressions
+
 ## [1.1.0] - 2017-08-30
 
 ### Added
