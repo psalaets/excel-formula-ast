@@ -23,7 +23,7 @@
   "peerDependencies": {},
   "dependencies": {},
   "devDependencies": {
-    "excel-formula-tokenizer": "^2.2.0",
+    "excel-formula-tokenizer": "^2.3.0",
     "mocha": "^3.3.0"
   }
 }
